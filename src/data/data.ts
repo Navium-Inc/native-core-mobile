@@ -1,0 +1,130 @@
+import { ChatItem } from "@/components/chat/ChatSort";
+import { FormatDate } from "@/lib/formatDate";
+
+
+const chatsContents: ChatItem[]  = [
+    {
+        id: "1",
+        title: "Alex Johnson",
+        image: "https://randomuser.me/api/portraits/men/11.jpg",
+        lastMessage: "Hey, are we still meeting today?",
+        lastMessageAt: "2026-07-21T09:15:00Z",
+        unreadCount: 2,
+    },
+    {
+        id: "2",
+        title: "Design Team",
+        image: "https://randomuser.me/api/portraits/women/12.jpg",
+        lastMessage: "The new mockups are ready for review.",
+        lastMessageAt: "2026-07-21T08:42:00Z",
+        unreadCount: 0,
+    },
+    {
+        id: "3",
+        title: "Sarah Parker",
+        image: "https://randomuser.me/api/portraits/women/23.jpg",
+        lastMessage: "Thanks! I'll send it over soon.",
+        lastMessageAt: "2026-07-20T22:10:00Z",
+        unreadCount: 5,
+    },
+    {
+        id: "4",
+        title: "Project Navium",
+        image: "https://randomuser.me/api/portraits/men/34.jpg",
+        lastMessage: "Deployment completed successfully.",
+        lastMessageAt: "2026-07-20T18:30:00Z",
+        unreadCount: 1,
+    },
+    {
+        id: "5",
+        title: "Family",
+        image: "https://randomuser.me/api/portraits/women/45.jpg",
+        lastMessage: "Dinner is at 8 PM tonight.",
+        lastMessageAt: "2026-07-20T17:05:00Z",
+        unreadCount: 0,
+    },
+    {
+        id: "6",
+        title: "Emma Watson",
+        image: "https://randomuser.me/api/portraits/women/56.jpg",
+        lastMessage: "Call me when you're free.",
+        lastMessageAt: "2026-07-20T14:25:00Z",
+        unreadCount: 8,
+    },
+    {
+        id: "7",
+        title: "Weekend Trip",
+        image: "https://randomuser.me/api/portraits/men/67.jpg",
+        lastMessage: "I've booked the hotel!",
+        lastMessageAt: "2026-07-20T12:40:00Z",
+        unreadCount: 3,
+    },
+    {
+        id: "8",
+        title: "Michael Lee",
+        image: "https://randomuser.me/api/portraits/men/78.jpg",
+        lastMessage: "See you tomorrow 👋",
+        lastMessageAt: "2026-07-20T11:55:00Z",
+        unreadCount: 0,
+    },
+    {
+        id: "9",
+        title: "Developers",
+        image: "https://randomuser.me/api/portraits/women/19.jpg",
+        lastMessage: "PR #42 has been merged.",
+        lastMessageAt: "2026-07-20T10:20:00Z",
+        unreadCount: 12,
+    },
+    {
+        id: "10",
+        title: "Coffee Buddies",
+        image: "https://randomuser.me/api/portraits/men/80.jpg",
+        lastMessage: "Who's up for coffee later?",
+        lastMessageAt: "2026-07-19T20:15:00Z",
+        unreadCount: 4,
+    },
+    {
+        id: "11",
+        title: "Olivia Brown",
+        image: "https://randomuser.me/api/portraits/women/31.jpg",
+        lastMessage: "Happy birthday! 🎉",
+        lastMessageAt: "2026-07-19T16:50:00Z",
+        unreadCount: 0,
+    },
+    {
+        id: "12",
+        title: "Gaming Squad",
+        image: "https://randomuser.me/api/portraits/men/42.jpg",
+        lastMessage: "Let's play at 9 PM.",
+        lastMessageAt: "2026-07-19T13:12:00Z",
+        unreadCount: 6,
+    },
+    {
+        id: "13",
+        title: "David Miller",
+        image: "https://randomuser.me/api/portraits/men/53.jpg",
+        lastMessage: "Received the documents, thanks.",
+        lastMessageAt: "2026-07-19T09:35:00Z",
+        unreadCount: 1,
+    },
+    {
+        id: "14",
+        title: "Office Updates",
+        image: "https://randomuser.me/api/portraits/women/64.jpg",
+        lastMessage: "The meeting has been rescheduled.",
+        lastMessageAt: "2026-07-18T21:45:00Z",
+        unreadCount: 0,
+    },
+    {
+        id: "15",
+        title: "Travel Plans",
+        image: "https://randomuser.me/api/portraits/men/75.jpg",
+        lastMessage: "Don't forget your passport!",
+        lastMessageAt: "2026-07-18T18:10:00Z",
+        unreadCount: 9,
+    },
+]
+
+export const chats = chatsContents.map((chat) => {
+    return {...chat, date: FormatDate(chat.lastMessageAt || '') }
+});
