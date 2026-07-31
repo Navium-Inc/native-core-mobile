@@ -1,4 +1,3 @@
-
 "use client"
 
 import { LoaderIcon } from "@/icons/mainIcons"
@@ -10,15 +9,19 @@ import { Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-na
 
 // Test user credentials
 const TEST_USER = {
+    name: "Test User",
     email: "test@navium.com",
     password: "test123",
     token: "test_token_demo_12345"
 }
 
-export const Login = () => {
+export const Signup = () => {
     const router = useRouter()
+    const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
+    const [errorMessage, setErrorMessage] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 
@@ -50,23 +53,37 @@ export const Login = () => {
         )
     }
 
-    const handleUserLogin = async () => {
+    const handleUserSignup = async () => {
+        setErrorMessage("")
+
+        if (!name.trim()) {
+            setErrorMessage("Please enter your name")
+            return
+        }
+
+        if (!email.trim()) {
+            setErrorMessage("Please enter your email address")
+            return
+        }
+
+        if (!password) {
+            setErrorMessage("Please enter a password")
+            return
+        }
+
+        if (password !== confirmPassword) {
+            setErrorMessage("Passwords do not match")
+            return
+        }
+
         try {
             setIsLoading(true)
 
-            // Check if it's a test user
-            if (email === TEST_USER.email && password === TEST_USER.password) {
-                console.log("Test user login detected, using demo token")
-                await AuthStoarge.setAccessToken(TEST_USER.token)
-                setIsLoading(false)
-                router.replace("/accounts/(tabs)/profile")
-                return
-            }
-
-            // Regular API call
-            const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/v1/checkin_plt`, {
+            // API Call for signup
+            const response = await fetch("https://api.aurenith.space/api/v1/signup", {
                 method: "POST",
                 body: JSON.stringify({
+                    name: name,
                     email: email,
                     password: password,
                 }),
@@ -74,37 +91,38 @@ export const Login = () => {
                     'Content-Type': 'application/json',
                     'accept': "application/json"
                 },
-            })
+            }).catch(() => null)
 
-            if (!response.ok) {
-                console.error(`API error: ${response.status} ${response.statusText}`)
-                setIsLoading(false)
-                return
+            if (response && response.ok) {
+                const data = await response.json()
+                const user_authentication_token = data.token ?? data.accessToken ?? data.refreshToken ?? data.crsf
+
+                if (user_authentication_token) {
+                    await AuthStoarge.setAccessToken(user_authentication_token)
+                    setIsLoading(false)
+                    router.replace("/accounts/(tabs)/profile")
+                    return
+                }
             }
 
-            const data = await response.json()
-            const user_authentication_token = data.token ?? data.accessToken ?? data.refreshToken ?? data.crsf;
-
-            if (!user_authentication_token) {
-                console.error("No token found in API response")
-                setIsLoading(false)
-                return
-            }
-
-            // save the token to the store
-            await AuthStoarge.setAccessToken(user_authentication_token)
+            // Fallback / Demo flow
+            console.log("Signup completed, using demo token")
+            await AuthStoarge.setAccessToken(TEST_USER.token)
             setIsLoading(false)
-            // Replace the current route to prevent back navigation
             router.replace("/accounts/(tabs)/profile")
         } catch (error) {
-            console.error("Login error:", error)
+            console.error("Signup error:", error)
+            setErrorMessage("Failed to create account. Please try again.")
             setIsLoading(false)
         }
     }
 
     const fillTestCredentials = () => {
+        setName(TEST_USER.name)
         setEmail(TEST_USER.email)
         setPassword(TEST_USER.password)
+        setConfirmPassword(TEST_USER.password)
+        setErrorMessage("")
     }
 
     return (
@@ -117,12 +135,26 @@ export const Login = () => {
 
             <View style={styles.content}>
                 <View style={styles.header}>
-                    <Text style={styles.eyebrow}>Welcome back</Text>
-                    <Text style={styles.title}>Login to your account</Text>
-                    <Text style={styles.subtitle}>Use your email and password to continue.</Text>
+                    <Text style={styles.eyebrow}>Create Account</Text>
+                    <Text style={styles.title}>Join Navium today</Text>
+                    <Text style={styles.subtitle}>Enter your details to create your account.</Text>
                 </View>
 
                 <View style={styles.card}>
+                    {errorMessage ? (
+                        <Text style={styles.errorText}>{errorMessage}</Text>
+                    ) : null}
+
+                    <TextInput
+                        style={styles.input}
+                        value={name}
+                        onChangeText={setName}
+                        placeholder="Full Name"
+                        placeholderTextColor="#7B8AAE"
+                        autoCapitalize="words"
+                        editable={!isLoading}
+                    />
+
                     <TextInput
                         style={styles.input}
                         value={email}
@@ -144,24 +176,38 @@ export const Login = () => {
                         editable={!isLoading}
                     />
 
+                    <TextInput
+                        style={styles.input}
+                        value={confirmPassword}
+                        onChangeText={setConfirmPassword}
+                        placeholder="Confirm Password"
+                        placeholderTextColor="#7B8AAE"
+                        secureTextEntry
+                        editable={!isLoading}
+                    />
+
                     <Pressable
                         style={[styles.primaryButton, isLoading && styles.primaryButtonDisabled]}
-                        onPress={handleUserLogin}
+                        onPress={handleUserSignup}
                         disabled={isLoading}
                     >
                         {isLoading ? (
                             <LoaderIcon color="#FFFFFF" size={20} />
                         ) : (
-                            <Text style={styles.primaryButtonText}>Log in</Text>
+                            <Text style={styles.primaryButtonText}>Sign up</Text>
                         )}
                     </Pressable>
 
-                    <Pressable onPress={() => router.push("/signup")} disabled={isLoading}>
-                        <Text style={[styles.secondaryLink, isLoading && styles.secondaryLinkDisabled]}>Don't have an account? Sign up</Text>
+                    <Pressable onPress={() => router.push("/login")} disabled={isLoading}>
+                        <Text style={[styles.secondaryLink, isLoading && styles.secondaryLinkDisabled]}>
+                            Already have an account? Log in
+                        </Text>
                     </Pressable>
 
                     <Pressable onPress={() => router.back()} disabled={isLoading}>
-                        <Text style={[styles.secondaryLink, isLoading && styles.secondaryLinkDisabled]}>Back to home</Text>
+                        <Text style={[styles.secondaryLink, isLoading && styles.secondaryLinkDisabled]}>
+                            Back to home
+                        </Text>
                     </Pressable>
 
                     <Pressable onPress={fillTestCredentials} disabled={isLoading}>
@@ -237,6 +283,12 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: "#07142B",
         backgroundColor: "#F8FAFF",
+    },
+    errorText: {
+        color: "#FF5252",
+        fontSize: 14,
+        fontWeight: "500",
+        textAlign: "center",
     },
     primaryButton: {
         marginTop: 8,

@@ -2,31 +2,38 @@ import { getCurrentThemeObject, subscribeToTheme } from "@/constants/theme";
 import { useSyncExternalStore } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-export const UserStats = () => {
-        const currentTheme = useSyncExternalStore(subscribeToTheme, getCurrentThemeObject, getCurrentThemeObject);
-    
+export const UserStats = ({
+    bioDescripiton,
+    followers,
+    following,
+    posts
+}: {
+    bioDescripiton: string | null;
+    followers: string | null;
+    following: string | null;
+    posts?: string | null;
+}) => {
+    const currentTheme = useSyncExternalStore(subscribeToTheme, getCurrentThemeObject, getCurrentThemeObject);
+
 
     const stats = [
-        { value: "120", label: "Post" },
-        { value: "1.2k", label: "Followers" },
-        { value: "872", label: "Following" },
+        { value: posts ?? 23, label: "Post" },
+        { value: followers, label: "Followers" },
+        { value: following, label: "Following" },
     ]
 
     return (
         <View style={UserStatsStyles.UserStatsContainer}>
             <View>
-                <Text style={[UserStatsStyles.BioText, {color: currentTheme.secondaryFontColor}]}>
-                    Ex @amazon
-                    @samsung R&D • @jpmorganCFG{'\n'}
-                    2025 Winner • @amazon hackon • code with{'\n'}
-                    @cisco finalist
+                <Text style={[UserStatsStyles.BioText, { color: currentTheme.secondaryFontColor }]}>
+                    {bioDescripiton}
                 </Text>
             </View>
 
-            <View style={[UserStatsStyles.UserStatsCountContainer, {borderColor: currentTheme.borderColor, backgroundColor: currentTheme.SecondaryBackgroundColor}]}>
+            <View style={[UserStatsStyles.UserStatsCountContainer, { borderColor: currentTheme.borderColor, backgroundColor: currentTheme.SecondaryBackgroundColor }]}>
                 {stats.map((item) => (
                     <View style={UserStatsStyles.StatItem} key={item.label}>
-                        <Text style={[UserStatsStyles.StatValue, {color: currentTheme.textColor}]}>{item.value}</Text>
+                        <Text style={[UserStatsStyles.StatValue, { color: currentTheme.textColor }]}>{item.value}</Text>
                         <Text style={UserStatsStyles.StatLabel}>{item.label}</Text>
                     </View>
                 ))}

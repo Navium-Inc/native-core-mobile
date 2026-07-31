@@ -1,13 +1,17 @@
 import { Image, StyleSheet, View } from "react-native"
 
-export const UserIcon = () => {
+export const UserIcon = ({
+    image_url
+}: {
+    image_url: string
+}) => {
     return (
         <View style={UserIconStyles.IconView}>
             <View>
                 <Image
-                style={UserIconStyles.IconImage}
-                source={require("../../../assets/images/profile.png")}
-            />
+                    style={UserIconStyles.IconImage}
+                    source={{ uri: image_url ?? undefined }}
+                />
             </View>
         </View>
     )

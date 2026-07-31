@@ -65,7 +65,7 @@ export const AuthPage = () => {
                     </View>
 
                     <View style={AuthPageStyles.ButtonsView}>
-                        <Pressable style={AuthPageStyles.GetStartedButton} onPress={() => router.push("/login")}>
+                        <Pressable style={AuthPageStyles.GetStartedButton} onPress={() => router.push("/signup")}>
                             <Text style={AuthPageStyles.GetStartedButtonText}>Get Started</Text>
                         </Pressable>
                         <Pressable style={AuthPageStyles.AlternateButton} onPress={() => router.push("/login")}>

@@ -1,6 +1,7 @@
 import { getCurrentThemeObject, subscribeToTheme } from "@/constants/theme"
-import { useState, useSyncExternalStore } from "react"
-import { Pressable, StyleSheet, Text, View } from "react-native"
+import { AuthStoarge } from "@/lib/authStorage"
+import { useEffect, useState, useSyncExternalStore } from "react"
+import { Image, Pressable, StyleSheet, Text, View } from "react-native"
 
 const tabItems = ["Posts", "Bookmarks", "Reposts"] as const
 
@@ -13,6 +14,23 @@ type ContentItem = {
     likes?: number
     reposts?: number
     bookmarks?: number
+}
+
+type ApiMedia = {
+    url: string
+}
+
+type ApiPost = {
+    id: string
+    description: string
+    type: string
+    media?: ApiMedia[]
+    createdAt: string
+    repostCount?: number
+    likeCount?: number
+    bookmarkCount?: number
+    shareCount?: number
+    commentCount?: number
 }
 
 const tabContent: Record<TabItem, ContentItem[]> = {
@@ -32,38 +50,6 @@ const tabContent: Record<TabItem, ContentItem[]> = {
             likes: 86,
             reposts: 14,
             bookmarks: 19,
-        },
-        {
-            title: "Coffee and code all day.",
-            description: "Building features with a strong espresso by my side.",
-            timestamp: "1d ago",
-            likes: 66,
-            reposts: 11,
-            bookmarks: 9,
-        },
-        {
-            title: "Late night UI polish.",
-            description: "Spent time fine-tuning spacing and shadows for the profile card.",
-            timestamp: "1d ago",
-            likes: 81,
-            reposts: 22,
-            bookmarks: 15,
-        },
-        {
-            title: "Weekend hiking plan.",
-            description: "Looking forward to a trail run with friends at sunrise.",
-            timestamp: "2d ago",
-            likes: 38,
-            reposts: 6,
-            bookmarks: 7,
-        },
-        {
-            title: "Design review notes.",
-            description: "Shared updates on the new onboarding flow with the team.",
-            timestamp: "3d ago",
-            likes: 55,
-            reposts: 10,
-            bookmarks: 20,
         },
     ],
     Bookmarks: [
@@ -142,6 +128,30 @@ const formatMeta = (item: ContentItem) => {
     return parts.join(" · ")
 }
 
+const formatTimestamp = (createdAt: string) => {
+    const time = Number(createdAt);
+    if (!time || isNaN(time)) return createdAt || "Recently";
+    const diffMs = Date.now() - time;
+    const diffSecs = Math.floor(diffMs / 1000);
+    if (diffSecs < 60) return "Just now";
+    const diffMins = Math.floor(diffSecs / 60);
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 30) return `${diffDays}d ago`;
+    return `${Math.floor(diffDays / 30)}mo ago`;
+}
+
+const formatApiPostMeta = (post: ApiPost) => {
+    const parts = [formatTimestamp(post.createdAt)]
+    if (post.likeCount !== undefined) parts.push(`${post.likeCount} likes`)
+    if (post.repostCount !== undefined) parts.push(`${post.repostCount} reposts`)
+    if (post.bookmarkCount !== undefined) parts.push(`${post.bookmarkCount} bookmarks`)
+    if (post.commentCount !== undefined) parts.push(`${post.commentCount} comments`)
+    return parts.join(" · ")
+}
+
 const parseTimestamp = (timestamp: string) => {
     const [value, unit] = timestamp.split(" ")[0].match(/(\d+)([hdw])/)?.slice(1) ?? []
     const amount = Number(value)
@@ -155,10 +165,59 @@ const sortByNewest = (items: ContentItem[]) =>
     [...items].sort((a, b) => parseTimestamp(a.timestamp) - parseTimestamp(b.timestamp))
 
 export const UserActive = () => {
-        const currentTheme = useSyncExternalStore(subscribeToTheme, getCurrentThemeObject, getCurrentThemeObject);
-    
+
+    const currentTheme = useSyncExternalStore(subscribeToTheme, getCurrentThemeObject, getCurrentThemeObject);
+
     const [activeTab, setActiveTab] = useState<TabItem>("Posts")
+    const [apiPosts, setApiPosts] = useState<ApiPost[]>([])
     const selectedContent = sortByNewest(tabContent[activeTab] ?? tabContent.Posts)
+
+    useEffect(() => {
+
+        const fetchPostQuery = async () => {
+            try {
+                const token = await AuthStoarge.getAccessToken();
+
+                const graphqlQuery = {
+                    query: `query {
+                        getUserPost {
+                            id
+                            description
+                            type 
+                            media {
+                                url
+                            }
+                            createdAt
+                            repostCount
+                            likeCount
+                            bookmarkCount
+                            shareCount
+                            commentCount
+                        } 
+                        
+                    }`
+                }
+                const userData = await fetch(`http://3.138.244.174:3001/api/v1/graphql`, {
+                    method: "POST",
+                    body: JSON.stringify(graphqlQuery),
+                    headers: {
+                        "content-type": "application/json",
+                        "cookie": token ? `plt_tk=${token}` : "",
+                        "authorization": token ? `Bearer ${token}` : ""
+                    }
+                })
+
+                const res = await userData.json();
+                const postsData = res?.data?.getUserPost || res?.result?.data?.getUserPost;
+                if (Array.isArray(postsData)) {
+                    setApiPosts(postsData);
+                }
+            } catch (err) {
+                console.error("Failed to fetch user posts:", err);
+            }
+        }
+        fetchPostQuery();
+    }, [])
 
     return (
         <View style={[UserActiveStyles.UserActiveContainer, { backgroundColor: currentTheme.backgroundColor }]}>
@@ -168,10 +227,10 @@ export const UserActive = () => {
                     return (
                         <Pressable
                             key={tab}
-                            style={[UserActiveStyles.tabButton, isActive && [UserActiveStyles.tabButtonActive, {backgroundColor: currentTheme.SecondaryBackgroundColor}]]}
+                            style={[UserActiveStyles.tabButton, isActive && [UserActiveStyles.tabButtonActive, { backgroundColor: currentTheme.SecondaryBackgroundColor }]]}
                             onPress={() => setActiveTab(tab)}
                         >
-                            <Text style={[UserActiveStyles.tabText, {color: currentTheme.textColor} , isActive && UserActiveStyles.tabTextActive, {color: currentTheme.textColor}]}>
+                            <Text style={[UserActiveStyles.tabText, { color: currentTheme.textColor }, isActive && UserActiveStyles.tabTextActive, { color: currentTheme.textColor }]}>
                                 {tab}
                             </Text>
                             {isActive && <View style={UserActiveStyles.activeIndicator} />}
@@ -179,14 +238,30 @@ export const UserActive = () => {
                     )
                 })}
             </View>
-            <View style={[UserActiveStyles.contentContainer, ]}>
-                {selectedContent.map((item, index) => (
-                    <View key={`${activeTab}-${index}`} style={[UserActiveStyles.card, {backgroundColor: currentTheme.SecondaryBackgroundColor, borderColor: currentTheme.borderColor}]}>
-                        <Text style={[UserActiveStyles.cardTitle, {color: currentTheme.textColor}]}>{item.title}</Text>
-                        <Text style={[UserActiveStyles.cardDescription, {color: currentTheme.secondaryFontColor}]}>{item.description}</Text>
-                        <Text style={UserActiveStyles.cardMeta}>{formatMeta(item)}</Text>
-                    </View>
-                ))}
+            <View style={[UserActiveStyles.contentContainer,]}>
+                {activeTab === "Posts" && apiPosts.length > 0 ? (
+                    apiPosts.map((post) => (
+                        <View key={post.id} style={[UserActiveStyles.card, { backgroundColor: currentTheme.SecondaryBackgroundColor, borderColor: currentTheme.borderColor }]}>
+                            <Text style={[UserActiveStyles.cardDescription, { color: currentTheme.textColor, fontSize: 15, marginBottom: 8 }]}>{post.description}</Text>
+                            {post.media && post.media.length > 0 && post.media[0]?.url ? (
+                                <Image
+                                    source={{ uri: post.media[0].url }}
+                                    style={UserActiveStyles.postMediaImage}
+                                    resizeMode="cover"
+                                />
+                            ) : null}
+                            <Text style={UserActiveStyles.cardMeta}>{formatApiPostMeta(post)}</Text>
+                        </View>
+                    ))
+                ) : (
+                    selectedContent.map((item, index) => (
+                        <View key={`${activeTab}-${index}`} style={[UserActiveStyles.card, { backgroundColor: currentTheme.SecondaryBackgroundColor, borderColor: currentTheme.borderColor }]}>
+                            <Text style={[UserActiveStyles.cardTitle, { color: currentTheme.textColor }]}>{item.title}</Text>
+                            <Text style={[UserActiveStyles.cardDescription, { color: currentTheme.secondaryFontColor }]}>{item.description}</Text>
+                            <Text style={UserActiveStyles.cardMeta}>{formatMeta(item)}</Text>
+                        </View>
+                    ))
+                )}
             </View>
         </View>
     )
@@ -260,5 +335,11 @@ const UserActiveStyles = StyleSheet.create({
     cardMeta: {
         color: "#8f8f8f",
         fontSize: 12,
+    },
+    postMediaImage: {
+        width: "100%",
+        height: 200,
+        borderRadius: 8,
+        marginVertical: 8,
     },
 })
