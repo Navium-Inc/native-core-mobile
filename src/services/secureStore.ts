@@ -5,6 +5,7 @@ export class SecureStorage {
 
     public static async set(key: string, value: string): Promise<void> {
         try {
+            console.log("KEY: " + key, " VALUE: " + value)
             await SecureStore.setItemAsync(key, value);
         } catch (error) {
             console.error(`Failed to set secure storage key '${key}':`, error);

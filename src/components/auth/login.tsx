@@ -19,6 +19,7 @@ export const Login = () => {
     const router = useRouter()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [errorMessage, setErrorMessage] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 
@@ -51,6 +52,18 @@ export const Login = () => {
     }
 
     const handleUserLogin = async () => {
+        setErrorMessage("")
+
+        if (!email.trim()) {
+            setErrorMessage("Please enter your email address")
+            return
+        }
+
+        if (!password) {
+            setErrorMessage("Please enter your password")
+            return
+        }
+
         try {
             setIsLoading(true)
 
@@ -77,7 +90,15 @@ export const Login = () => {
             })
 
             if (!response.ok) {
-                console.error(`API error: ${response.status} ${response.statusText}`)
+                let errorDetails = ""
+                try {
+                    const errorJson = await response.json()
+                    errorDetails = errorJson.message || errorJson.error || errorJson.msg || JSON.stringify(errorJson)
+                } catch {
+                    errorDetails = await response.text()
+                }
+                console.error(`API error ${response.status}:`, errorDetails)
+                setErrorMessage(errorDetails || `Login failed (${response.status})`)
                 setIsLoading(false)
                 return
             }
@@ -86,7 +107,8 @@ export const Login = () => {
             const user_authentication_token = data.token ?? data.accessToken ?? data.refreshToken ?? data.crsf;
 
             if (!user_authentication_token) {
-                console.error("No token found in API response")
+                console.error("No token found in API response:", data)
+                setErrorMessage("No authentication token returned from server")
                 setIsLoading(false)
                 return
             }
@@ -98,6 +120,7 @@ export const Login = () => {
             router.replace("/accounts/(tabs)/profile")
         } catch (error) {
             console.error("Login error:", error)
+            setErrorMessage("Network or connection error. Please try again.")
             setIsLoading(false)
         }
     }
@@ -105,6 +128,7 @@ export const Login = () => {
     const fillTestCredentials = () => {
         setEmail(TEST_USER.email)
         setPassword(TEST_USER.password)
+        setErrorMessage("")
     }
 
     return (
@@ -123,6 +147,10 @@ export const Login = () => {
                 </View>
 
                 <View style={styles.card}>
+                    {errorMessage ? (
+                        <Text style={styles.errorText}>{errorMessage}</Text>
+                    ) : null}
+
                     <TextInput
                         style={styles.input}
                         value={email}
@@ -237,6 +265,12 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: "#07142B",
         backgroundColor: "#F8FAFF",
+    },
+    errorText: {
+        color: "#FF5252",
+        fontSize: 14,
+        fontWeight: "500",
+        textAlign: "center",
     },
     primaryButton: {
         marginTop: 8,

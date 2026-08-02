@@ -21,6 +21,7 @@ export const UserProfile = () => {
     useEffect(() => {
         const fetchUserQuery = async () => {
             const token = await AuthStoarge.getAccessToken();
+            console.log(token)
 
             const graphqlQuery = {
                 query: `query {
@@ -37,7 +38,7 @@ export const UserProfile = () => {
                         }
                 }`
             }
-            const userData = await fetch(`http://3.138.244.174:3001/api/v1/graphql`, {
+            const userData = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/v1/graphql`, {
                 method: "POST",
                 body: JSON.stringify(graphqlQuery),
                 headers: {
@@ -59,6 +60,8 @@ export const UserProfile = () => {
             const banner = data["getUser"]["banner"];
             const bio = data["getUser"]["bio"];
             const image_url = data["getUser"]["image_url"];
+
+
             if (firstname && lastname) {
                 setName(firstname + " " + lastname);
             }

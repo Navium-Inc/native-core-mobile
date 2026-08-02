@@ -197,7 +197,7 @@ export const UserActive = () => {
                         
                     }`
                 }
-                const userData = await fetch(`http://3.138.244.174:3001/api/v1/graphql`, {
+                const userData = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/v1/graphql`, {
                     method: "POST",
                     body: JSON.stringify(graphqlQuery),
                     headers: {
@@ -212,6 +212,8 @@ export const UserActive = () => {
                 if (Array.isArray(postsData)) {
                     setApiPosts(postsData);
                 }
+
+                console.log(JSON.stringify(res))
             } catch (err) {
                 console.error("Failed to fetch user posts:", err);
             }

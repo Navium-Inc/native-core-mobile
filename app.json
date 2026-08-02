@@ -9,7 +9,12 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/images/appicon.png",
-      "bundleIdentifier": "com.anonymous.naviumcltandroid"
+      "bundleIdentifier": "com.anonymous.naviumcltandroid",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "package": "com.xnishidh.naviumcltandroid",
