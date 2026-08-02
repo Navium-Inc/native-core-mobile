@@ -95,7 +95,7 @@ export const Login = () => {
                     const errorJson = await response.json()
                     errorDetails = errorJson.message || errorJson.error || errorJson.msg || JSON.stringify(errorJson)
                 } catch {
-                    errorDetails = await response.text()
+                    errorDetails = await response.json()
                 }
                 console.error(`API error ${response.status}:`, errorDetails)
                 setErrorMessage(errorDetails || `Login failed (${response.status})`)
