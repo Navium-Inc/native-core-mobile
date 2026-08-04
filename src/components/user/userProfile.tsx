@@ -3,20 +3,21 @@ import { getCurrentThemeObject, subscribeToTheme } from "@/constants/theme";
 import { AuthStoarge } from "@/lib/authStorage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { Animated, Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from "react-native";
 import { UserActive } from "./userActive";
 import { UserIcon } from "./userIcon";
 import { UserStats } from "./userStats";
 
+const DEFAULT_BANNER = require("@/assets/images/banner.jpeg");
+
 export const UserProfile = () => {
     const [username, setUsername] = useState<string | null>(null);
     const [name, setName] = useState<string | null>(null);
-    const [profileImage, setProfileImage] = useState<string | null>(null);
     const [followers, setFollowers] = useState<string | null>(null);
     const [following, setFollowing] = useState<string | null>(null);
     const [banner, setBanner] = useState<string | null>(null);
     const [bioDescripiton, setBioDescripition] = useState<string | null>(null);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [profileImage, setProfileImage] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUserQuery = async () => {
@@ -54,22 +55,18 @@ export const UserProfile = () => {
             const Username = data["getUser"]["username"];
             const firstname = data["getUser"]["firstname"];
             const lastname = data["getUser"]["lastname"];
-            const imageUrl = data["getUser"]["image_url"];
+            const fetchedImageUrl = data["getUser"]["image_url"];
             const followingCount = data["getUser"]["followingCount"];
             const followersCount = data["getUser"]["followersCount"];
-            const banner = data["getUser"]["banner"];
+            const fetchedBanner = data["getUser"]["banner"];
             const bio = data["getUser"]["bio"];
-            const image_url = data["getUser"]["image_url"];
 
 
-            if (firstname && lastname) {
-                setName(firstname + " " + lastname);
+            if (firstname || lastname) {
+                setName([firstname, lastname].filter(Boolean).join(" "));
             }
             if (Username) {
                 setUsername(Username);
-            }
-            if (imageUrl) {
-                setProfileImage(imageUrl);
             }
             if (followingCount) {
                 setFollowing(followingCount);
@@ -77,14 +74,14 @@ export const UserProfile = () => {
             if (followersCount) {
                 setFollowers(followersCount);
             }
-            if (banner) {
-                setBanner(banner);
+            if (fetchedBanner) {
+                setBanner(fetchedBanner);
             }
             if (bio) {
                 setBioDescripition(bio);
             }
-            if (image_url) {
-                setImageUrl(imageUrl)
+            if (fetchedImageUrl) {
+                setProfileImage(fetchedImageUrl);
             }
         }
 
@@ -109,12 +106,16 @@ export const UserProfile = () => {
             currentTheme.backgroundColor,
         ];
 
+    const bannerSource: ImageSourcePropType = banner && banner.trim() !== ""
+        ? { uri: banner }
+        : DEFAULT_BANNER;
+
     return (
         <Animated.View style={[UserProfileStyles.Container, { backgroundColor: currentTheme.backgroundColor }]}>
             <ScrollView style={UserProfileStyles.scrollView} contentContainerStyle={UserProfileStyles.scrollContent}>
                 <View style={UserProfileStyles.BannerContainer}>
                     <Image
-                        source={{ uri: banner ?? undefined }}
+                        source={bannerSource}
                         style={UserProfileStyles.BannerImage}
                         resizeMode="cover"
                     />
@@ -125,7 +126,7 @@ export const UserProfile = () => {
                         style={UserProfileStyles.gradient}
                     />
                     <View style={[UserProfileStyles.IconWrapper]}>
-                        <UserIcon image_url={imageUrl as string} />
+                        <UserIcon image_url={profileImage as string} />
                     </View>
                 </View>
                 <View style={UserProfileStyles.ProfileDescripiton}>

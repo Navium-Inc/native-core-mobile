@@ -33,86 +33,92 @@ type ApiPost = {
     commentCount?: number
 }
 
+// const tabContent: Record<TabItem, ContentItem[]> = {
+//     Posts: [
+//         {
+//             title: "Just finished a run in the park.",
+//             description: "Feeling great after a 5k with fresh air and good music.",
+//             timestamp: "2h ago",
+//             likes: 42,
+//             reposts: 8,
+//             bookmarks: 12,
+//         },
+//         {
+//             title: "New app update is live!",
+//             description: "Added dark mode improvements and faster profile loading.",
+//             timestamp: "5h ago",
+//             likes: 86,
+//             reposts: 14,
+//             bookmarks: 19,
+//         },
+//     ],
+//     Bookmarks: [
+//         {
+//             title: "React Native tips for list performance.",
+//             description: "A quick reference for optimizing FlatList and ScrollView.",
+//             timestamp: "3d ago",
+//             bookmarks: 34,
+//             likes: 20,
+//         },
+//         {
+//             title: "Design system patterns.",
+//             description: "Reusable UI components that scale across products.",
+//             timestamp: "6d ago",
+//             bookmarks: 22,
+//             likes: 11,
+//         },
+//         {
+//             title: "Expo router guide.",
+//             description: "Navigation best practices for Expo and React Native.",
+//             timestamp: "1w ago",
+//             bookmarks: 18,
+//             likes: 7,
+//         },
+//         {
+//             title: "Accessibility checklist.",
+//             description: "A bookmark for screen reader and color contrast best practices.",
+//             timestamp: "8d ago",
+//             bookmarks: 12,
+//             likes: 5,
+//         },
+//     ],
+//     Reposts: [
+//         {
+//             title: "Team wins hackathon!",
+//             description: "Celebrating our project going from idea to prototype in 24 hours.",
+//             timestamp: "12h ago",
+//             reposts: 52,
+//             likes: 110,
+//         },
+//         {
+//             title: "Open source release notes.",
+//             description: "New version includes bug fixes, docs updates, and performance gains.",
+//             timestamp: "1d ago",
+//             reposts: 29,
+//             likes: 74,
+//         },
+//         {
+//             title: "UI inspiration board.",
+//             description: "A curated set of landing pages and mobile screens worth bookmarking.",
+//             timestamp: "2d ago",
+//             reposts: 18,
+//             likes: 38,
+//         },
+//         {
+//             title: "Design sprint highlights.",
+//             description: "Reposting a summary of the week’s top product decisions.",
+//             timestamp: "3d ago",
+//             reposts: 14,
+//             likes: 28,
+//         },
+//     ],
+// }
+
 const tabContent: Record<TabItem, ContentItem[]> = {
-    Posts: [
-        {
-            title: "Just finished a run in the park.",
-            description: "Feeling great after a 5k with fresh air and good music.",
-            timestamp: "2h ago",
-            likes: 42,
-            reposts: 8,
-            bookmarks: 12,
-        },
-        {
-            title: "New app update is live!",
-            description: "Added dark mode improvements and faster profile loading.",
-            timestamp: "5h ago",
-            likes: 86,
-            reposts: 14,
-            bookmarks: 19,
-        },
-    ],
-    Bookmarks: [
-        {
-            title: "React Native tips for list performance.",
-            description: "A quick reference for optimizing FlatList and ScrollView.",
-            timestamp: "3d ago",
-            bookmarks: 34,
-            likes: 20,
-        },
-        {
-            title: "Design system patterns.",
-            description: "Reusable UI components that scale across products.",
-            timestamp: "6d ago",
-            bookmarks: 22,
-            likes: 11,
-        },
-        {
-            title: "Expo router guide.",
-            description: "Navigation best practices for Expo and React Native.",
-            timestamp: "1w ago",
-            bookmarks: 18,
-            likes: 7,
-        },
-        {
-            title: "Accessibility checklist.",
-            description: "A bookmark for screen reader and color contrast best practices.",
-            timestamp: "8d ago",
-            bookmarks: 12,
-            likes: 5,
-        },
-    ],
-    Reposts: [
-        {
-            title: "Team wins hackathon!",
-            description: "Celebrating our project going from idea to prototype in 24 hours.",
-            timestamp: "12h ago",
-            reposts: 52,
-            likes: 110,
-        },
-        {
-            title: "Open source release notes.",
-            description: "New version includes bug fixes, docs updates, and performance gains.",
-            timestamp: "1d ago",
-            reposts: 29,
-            likes: 74,
-        },
-        {
-            title: "UI inspiration board.",
-            description: "A curated set of landing pages and mobile screens worth bookmarking.",
-            timestamp: "2d ago",
-            reposts: 18,
-            likes: 38,
-        },
-        {
-            title: "Design sprint highlights.",
-            description: "Reposting a summary of the week’s top product decisions.",
-            timestamp: "3d ago",
-            reposts: 14,
-            likes: 28,
-        },
-    ],
-}
+    Posts: [],
+    Bookmarks: [],
+    Reposts: [],
+};
 
 const formatMeta = (item: ContentItem) => {
     const parts = [item.timestamp]
@@ -256,13 +262,8 @@ export const UserActive = () => {
                         </View>
                     ))
                 ) : (
-                    selectedContent.map((item, index) => (
-                        <View key={`${activeTab}-${index}`} style={[UserActiveStyles.card, { backgroundColor: currentTheme.SecondaryBackgroundColor, borderColor: currentTheme.borderColor }]}>
-                            <Text style={[UserActiveStyles.cardTitle, { color: currentTheme.textColor }]}>{item.title}</Text>
-                            <Text style={[UserActiveStyles.cardDescription, { color: currentTheme.secondaryFontColor }]}>{item.description}</Text>
-                            <Text style={UserActiveStyles.cardMeta}>{formatMeta(item)}</Text>
-                        </View>
-                    ))
+                    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: "50%" }}><Text style={{ color: currentTheme.textColor }}>No {activeTab} Found</Text></View>
+
                 )}
             </View>
         </View>

@@ -37,7 +37,7 @@ export const InitialPage = () => {
 
         const timer = setTimeout(() => {
             checkAuthAndNavigate();
-        }, 2000);
+        }, 1000);
 
         return () => clearTimeout(timer);
     }, [router]);

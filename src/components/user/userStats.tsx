@@ -17,9 +17,9 @@ export const UserStats = ({
 
 
     const stats = [
-        { value: posts ?? 23, label: "Post" },
-        { value: followers, label: "Followers" },
-        { value: following, label: "Following" },
+        { value: posts ?? 0, label: "Post" },
+        { value: followers ?? 0, label: "Followers" },
+        { value: following ?? 0, label: "Following" },
     ]
 
     return (

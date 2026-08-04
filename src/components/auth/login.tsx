@@ -8,12 +8,6 @@ import { useRouter } from "expo-router"
 import { useEffect, useState } from "react"
 import { Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native"
 
-// Test user credentials
-const TEST_USER = {
-    email: "test@navium.com",
-    password: "test123",
-    token: "test_token_demo_12345"
-}
 
 export const Login = () => {
     const router = useRouter()
@@ -68,13 +62,13 @@ export const Login = () => {
             setIsLoading(true)
 
             // Check if it's a test user
-            if (email === TEST_USER.email && password === TEST_USER.password) {
-                console.log("Test user login detected, using demo token")
-                await AuthStoarge.setAccessToken(TEST_USER.token)
-                setIsLoading(false)
-                router.replace("/accounts/(tabs)/profile")
-                return
-            }
+            // if (email === TEST_USER.email && password === TEST_USER.password) {
+            //     console.log("Test user login detected, using demo token")
+            //     await AuthStoarge.setAccessToken(TEST_USER.token)
+            //     setIsLoading(false)
+            //     router.replace("/accounts/(tabs)/profile")
+            //     return
+            // }
 
             // Regular API call
             const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/v1/checkin_plt`, {
@@ -125,11 +119,11 @@ export const Login = () => {
         }
     }
 
-    const fillTestCredentials = () => {
-        setEmail(TEST_USER.email)
-        setPassword(TEST_USER.password)
-        setErrorMessage("")
-    }
+    // const fillTestCredentials = () => {
+    //     setEmail(TEST_USER.email)
+    //     setPassword(TEST_USER.password)
+    //     setErrorMessage("")
+    // }
 
     return (
         <View style={styles.container}>
@@ -191,10 +185,10 @@ export const Login = () => {
                     <Pressable onPress={() => router.back()} disabled={isLoading}>
                         <Text style={[styles.secondaryLink, isLoading && styles.secondaryLinkDisabled]}>Back to home</Text>
                     </Pressable>
-
+                    {/* 
                     <Pressable onPress={fillTestCredentials} disabled={isLoading}>
                         <Text style={[styles.testLink, isLoading && styles.testLinkDisabled]}>Use Test User</Text>
-                    </Pressable>
+                    </Pressable> */}
                 </View>
             </View>
         </View>
