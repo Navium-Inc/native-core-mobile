@@ -1,5 +1,4 @@
-"use client"
-
+import { CalendarModal } from "@/components/ui/CalendarModal"
 import { LoaderIcon } from "@/icons/mainIcons"
 import { AuthStoarge } from "@/lib/authStorage"
 import { LinearGradient } from "expo-linear-gradient"
@@ -23,6 +22,7 @@ export const Signup = () => {
     const [username, setUsername] = useState("")
     const [phoneNumber, setPhoneNumber] = useState("")
     const [dob, setDob] = useState("")
+    const [showCalendarModal, setShowCalendarModal] = useState(false)
 
     const [errorMessage, setErrorMessage] = useState("")
     const [isLoading, setIsLoading] = useState(false)
@@ -476,13 +476,23 @@ export const Signup = () => {
                                 editable={!isLoading}
                             />
 
-                            <TextInput
-                                style={styles.input}
-                                value={dob}
-                                onChangeText={setDob}
-                                placeholder="Date of Birth (YYYY-MM-DD)"
-                                placeholderTextColor="#7B8AAE"
-                                editable={!isLoading}
+                            <Pressable onPress={() => setShowCalendarModal(true)} disabled={isLoading}>
+                                <View style={[styles.input, styles.dateInputRow]}>
+                                    <Text style={[styles.dateInputText, !dob && styles.placeholderText]}>
+                                        {dob ? dob : "Select Date of Birth (YYYY-MM-DD)"}
+                                    </Text>
+                                    <Text style={styles.calendarIconText}>📅</Text>
+                                </View>
+                            </Pressable>
+
+                            <CalendarModal
+                                visible={showCalendarModal}
+                                onClose={() => setShowCalendarModal(false)}
+                                onSelectDate={(selectedDate) => {
+                                    setDob(selectedDate)
+                                    setErrorMessage("")
+                                }}
+                                initialDate={dob}
                             />
 
                             <Pressable
@@ -665,6 +675,23 @@ const styles = StyleSheet.create({
     },
     secondaryLinkDisabled: {
         opacity: 0.5,
+    },
+    dateInputRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
+    dateInputText: {
+        flex: 1,
+        fontSize: 15,
+        color: "#07142B",
+    },
+    placeholderText: {
+        color: "#7B8AAE",
+    },
+    calendarIconText: {
+        fontSize: 18,
+        marginLeft: 8,
     },
 })
 
