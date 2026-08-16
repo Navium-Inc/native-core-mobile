@@ -1,6 +1,7 @@
 "use client"
 import { getCurrentThemeObject, subscribeToTheme } from "@/constants/theme";
 import { AuthStoarge } from "@/lib/authStorage";
+import { getUserPostCount } from "@/services/api/posts";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { Animated, Image, ImageSourcePropType, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -18,6 +19,7 @@ export const UserProfile = () => {
     const [banner, setBanner] = useState<string | null>(null);
     const [bioDescripiton, setBioDescripition] = useState<string | null>(null);
     const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [postCount, setPostCount] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUserQuery = async () => {
@@ -65,8 +67,10 @@ export const UserProfile = () => {
             if (firstname || lastname) {
                 setName([firstname, lastname].filter(Boolean).join(" "));
             }
-            if (Username) {
+            if (Username && Username.length > 0) {
                 setUsername(Username);
+                const post_count = await getUserPostCount(username ?? "")
+                setPostCount(post_count)
             }
             if (followingCount) {
                 setFollowing(followingCount);
@@ -136,7 +140,7 @@ export const UserProfile = () => {
                     <View>
                         <Text style={{ color: currentTheme.secondaryFontColor, width: "100%", textAlign: "center", fontSize: 15 }}>@{username}</Text>
                     </View>
-                    <UserStats bioDescripiton={bioDescripiton} followers={followers} following={following} />
+                    <UserStats bioDescripiton={bioDescripiton} followers={followers} following={following} posts={postCount} />
                     <UserActive />
                 </View>
             </ScrollView>
